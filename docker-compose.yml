@@ -1,12 +1,9 @@
+name: "srvrx-www"
+
 services:
   srvrx-www:
     build: .
+    container_name: srvrx-www
     restart: unless-stopped
     ports:
       - "9999:80"
-    networks:
-      - proxy-net
-
-networks:
-  proxy-net:
-    external: true
