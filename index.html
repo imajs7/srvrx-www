@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRVRX — Restricted</title>
+<style>
+  :root {
+    --bg: #070b0f;
+    --grid: rgba(0, 255, 180, 0.03);
+    --accent: #00ffb4;
+    --accent2: #0af;
+    --dim: rgba(255,255,255,0.08);
+    --text: rgba(255,255,255,0.85);
+    --muted: rgba(255,255,255,0.35);
+    --danger: #ff4466;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* grid bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* scan line animation */
+  body::after {
+    content: '';
+    position: fixed; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.15;
+    animation: scan 6s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+  @keyframes scan { from { top: -2px; } to { top: 100vh; } }
+
+  .wrap {
+    position: relative; z-index: 2;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  /* --- top bar --- */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--dim);
+    padding-bottom: 16px;
+  }
+  .logo {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    font-weight: bold;
+  }
+  .badge {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 3px 10px;
+    border-radius: 2px;
+    animation: blink 2.4s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* --- hero --- */
+  .hero { display: flex; flex-direction: column; gap: 20px; }
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .hero-title {
+    font-size: clamp(32px, 6vw, 58px);
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    line-height: 1.1;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .hero-title .hl { color: var(--accent); }
+  .hero-title .hl2 { color: var(--accent2); }
+
+  .hero-sub {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--muted);
+    max-width: 520px;
+    font-family: 'Courier New', monospace;
+  }
+  .hero-sub .blk {
+    background: rgba(0,255,180,0.07);
+    color: var(--accent);
+    padding: 0 5px;
+    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  /* --- status block --- */
+  .status-block {
+    background: rgba(255,68,102,0.05);
+    border: 1px solid rgba(255,68,102,0.2);
+    border-radius: 4px;
+    padding: 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .status-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .status-key {
+    color: var(--danger);
+    min-width: 110px;
+    flex-shrink: 0;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+  }
+  .status-val { color: var(--muted); }
+
+  /* --- capability grid --- */
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--dim);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--dim);
+    border: 1px solid var(--dim);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .cell {
+    background: var(--bg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background 0.2s;
+  }
+  .cell:hover { background: rgba(0,255,180,0.04); }
+  .cell-tag {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .cell-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.05em;
+  }
+  .cell-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .cell-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .tag {
+    font-size: 9px;
+    padding: 2px 7px;
+    border: 1px solid rgba(10,170,255,0.25);
+    color: var(--accent2);
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+
+  /* --- terminal block --- */
+  .terminal {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--dim);
+    border-radius: 4px;
+    padding: 20px 24px;
+    font-size: 12px;
+    line-height: 2;
+    color: var(--muted);
+    overflow: hidden;
+  }
+  .terminal .p { color: var(--accent); }
+  .terminal .c { color: rgba(255,255,255,0.5); }
+  .terminal .v { color: var(--accent2); }
+  .terminal .e { color: var(--danger); }
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 13px;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* --- footer --- */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--dim);
+    padding-top: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-left { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
+  .footer-right { font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 0.15em; }
+
+  @media (max-width: 500px) {
+    .wrap { padding: 40px 20px 60px; gap: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- top bar -->
+  <div class="topbar">
+    <div class="logo">SRVRX // INFRASTRUCTURE</div>
+    <div class="badge">&#9679; RESTRICTED ACCESS</div>
+  </div>
+
+  <!-- hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">// internal systems — not for public consumption</div>
+    <div class="hero-title">
+      We build the<br>
+      <span class="hl">invisible layer</span><br>
+      <span class="hl2">everything runs on.</span>
+    </div>
+    <div class="hero-sub">
+      If you're here, you weren't meant to be. This domain operates
+      <span class="blk">*.env.srvrx.run</span> — a private mesh of
+      client environments, deployment pipelines, and platform services.
+      What you see is the surface. The infrastructure goes deeper.
+    </div>
+  </div>
+
+  <!-- status -->
+  <div class="status-block">
+    <div class="status-row">
+      <div class="status-key">ACCESS_LEVEL</div>
+      <div class="status-val">PUBLIC — INGRESS BLOCKED. Internal routes operate on authenticated subdomains only.</div>
+    </div>
+    <div class="status-row">
+      <div class="status-key">ENVIRONMENT</div>
+      <div class="status-val">SIT / UAT / PROD zones active. Client namespaces isolated per tenant.</div>
+    </div>
+    <div class="status-row">
+      <div class="status-key">DISCLOSURE</div>
+      <div class="status-val">This platform is not a product. It is an operational substrate for engineering teams we work with.</div>
+    </div>
+  </div>
+
+  <!-- capabilities -->
+  <div>
+    <div class="section-label">Capability surface</div>
+    <div class="grid">
+      <div class="cell">
+        <div class="cell-tag">01 / Infra</div>
+        <div class="cell-title">Cloud-native architecture</div>
+        <div class="cell-desc">Multi-tenant platform design, zero-downtime deployments, environment-aware routing.</div>
+        <div class="cell-stack">
+          <span class="tag">K8s</span>
+          <span class="tag">Traefik</span>
+          <span class="tag">Terraform</span>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="cell-tag">02 / Platform</div>
+        <div class="cell-title">Developer platforms</div>
+        <div class="cell-desc">Internal developer portals, self-service env provisioning, GitOps pipelines.</div>
+        <div class="cell-stack">
+          <span class="tag">ArgoCD</span>
+          <span class="tag">Backstage</span>
+          <span class="tag">GitHub Actions</span>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="cell-tag">03 / Backend</div>
+        <div class="cell-title">API & service design</div>
+        <div class="cell-desc">Microservices, event-driven systems, API gateway patterns, async workloads.</div>
+        <div class="cell-stack">
+          <span class="tag">Node</span>
+          <span class="tag">Go</span>
+          <span class="tag">Kafka</span>
+          <span class="tag">gRPC</span>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="cell-tag">04 / Observability</div>
+        <div class="cell-title">Platform intelligence</div>
+        <div class="cell-desc">Distributed tracing, log aggregation, anomaly detection across environments.</div>
+        <div class="cell-stack">
+          <span class="tag">Grafana</span>
+          <span class="tag">Loki</span>
+          <span class="tag">Tempo</span>
+          <span class="tag">Prometheus</span>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="cell-tag">05 / Security</div>
+        <div class="cell-title">Zero-trust posture</div>
+        <div class="cell-desc">Secrets management, mTLS between services, RBAC across tenants.</div>
+        <div class="cell-stack">
+          <span class="tag">Vault</span>
+          <span class="tag">SOPS</span>
+          <span class="tag">Cert-manager</span>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="cell-tag">06 / Delivery</div>
+        <div class="cell-title">Continuous delivery</div>
+        <div class="cell-desc">Environment promotion workflows, feature flag systems, canary rollout strategies.</div>
+        <div class="cell-stack">
+          <span class="tag">Helm</span>
+          <span class="tag">Flux</span>
+          <span class="tag">LaunchDarkly</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- terminal -->
+  <div class="terminal">
+    <div><span class="p">srvrx@mesh:~$</span> <span class="c">resolve client2-crm-ui.sit.srvrx.run</span></div>
+    <div><span class="v">→ wildcard match</span> <span class="c">*.sit.srvrx.run → 10.x.x.x (traefik ingress)</span></div>
+    <div><span class="v">→ router match</span> <span class="c">Host(`client2-crm-ui.sit.srvrx.run`)</span></div>
+    <div><span class="v">→ tls</span> <span class="c">wildcard cert *.sit.srvrx.run [valid]</span></div>
+    <div><span class="p">srvrx@mesh:~$</span> <span class="c">env list</span></div>
+    <div><span class="c">SIT  &nbsp;·· 12 tenants active</span></div>
+    <div><span class="c">UAT  &nbsp;·· 8 tenants active</span></div>
+    <div><span class="e">PROD &nbsp;·· [CLASSIFIED] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="cursor"></span></div>
+  </div>
+
+  <!-- footer -->
+  <div class="footer">
+    <div class="footer-left">srvrx.run &mdash; private infrastructure operations</div>
+    <div class="footer-right">NOT FOR PUBLIC DISTRIBUTION</div>
+  </div>
+
+</div>
+</body>
+</html>

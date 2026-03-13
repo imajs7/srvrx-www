@@ -1,0 +1,12 @@
+services:
+  srvrx-www:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "9999:80"
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true
