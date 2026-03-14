@@ -1,388 +1,1451 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SRVRX — Restricted</title>
-<style>
-  :root {
-    --bg: #070b0f;
-    --grid: rgba(0, 255, 180, 0.03);
-    --accent: #00ffb4;
-    --accent2: #0af;
-    --dim: rgba(255,255,255,0.08);
-    --text: rgba(255,255,255,0.85);
-    --muted: rgba(255,255,255,0.35);
-    --danger: #ff4466;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Courier New', monospace;
-    overflow-x: hidden;
-    min-height: 100vh;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SRVRX — Restricted</title>
+    <style>
+      :root {
+        --bg: #070b0f;
+        --grid: rgba(0, 255, 180, 0.03);
+        --accent: #00ffb4;
+        --accent2: #29b6f6;
+        --dim: rgba(255, 255, 255, 0.12);
+        --text: #ffffff;
+        --muted: rgba(255, 255, 255, 0.75);
+        --danger: #ff6b6b;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Courier New", monospace;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent),
+          transparent
+        );
+        opacity: 0.15;
+        animation: scan 6s linear infinite;
+        z-index: 1;
+        pointer-events: none;
+      }
+      @keyframes scan {
+        from {
+          top: -2px;
+        }
+        to {
+          top: 100vh;
+        }
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      @keyframes flow {
+        to {
+          stroke-dashoffset: -24;
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
 
-  /* grid bg */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+      .wrap {
+        position: relative;
+        z-index: 2;
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 60px 32px 80px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+      }
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--dim);
+        padding-bottom: 16px;
+      }
+      .logo {
+        font-size: 13px;
+        letter-spacing: 0.25em;
+        color: var(--accent);
+        font-weight: bold;
+      }
+      .badge {
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 3px 10px;
+        border-radius: 2px;
+        animation: blink 2.4s step-end infinite;
+      }
+      .hero {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .hero-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.3em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+      .hero-title {
+        font-size: clamp(32px, 6vw, 58px);
+        font-weight: 700;
+        font-family: "Courier New", monospace;
+        line-height: 1.1;
+        color: #fff;
+        letter-spacing: -0.01em;
+      }
+      .hero-title .hl {
+        color: var(--accent);
+      }
+      .hero-title .hl2 {
+        color: var(--accent2);
+      }
+      .hero-sub {
+        font-size: 13px;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 520px;
+        font-family: "Courier New", monospace;
+      }
+      .hero-sub .blk {
+        background: rgba(0, 255, 180, 0.07);
+        color: var(--accent);
+        padding: 0 5px;
+        border-radius: 2px;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+      }
+      .status-block {
+        background: rgba(255, 68, 102, 0.05);
+        border: 1px solid rgba(255, 68, 102, 0.2);
+        border-radius: 4px;
+        padding: 18px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .status-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .status-key {
+        color: var(--danger);
+        min-width: 110px;
+        flex-shrink: 0;
+        letter-spacing: 0.1em;
+        font-size: 10px;
+      }
+      .status-val {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .section-label {
+        font-size: 10px;
+        letter-spacing: 0.3em;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .section-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--dim);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1px;
+        background: var(--dim);
+        border: 1px solid var(--dim);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .cell {
+        background: var(--bg);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: background 0.2s;
+      }
+      .cell:hover {
+        background: rgba(0, 255, 180, 0.04);
+      }
+      .cell-tag {
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        color: #00ffb4;
+        text-transform: uppercase;
+      }
+      .cell-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 0.05em;
+      }
+      .cell-desc {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.7;
+      }
+      .cell-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 4px;
+      }
+      .tag {
+        font-size: 9px;
+        padding: 2px 7px;
+        border: 1px solid rgba(41, 182, 246, 0.25);
+        color: var(--accent2);
+        border-radius: 2px;
+        letter-spacing: 0.1em;
+      }
+      .diagram-wrap {
+        background: rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 28px 20px 20px;
+        position: relative;
+        overflow: hidden;
+      }
+      .diagram-wrap::before {
+        content: "MESH TOPOLOGY // CLASSIFIED";
+        position: absolute;
+        top: 10px;
+        right: 16px;
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        color: rgba(255, 68, 102, 0.5);
+        font-family: "Courier New", monospace;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .leg-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .leg-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
+      .terminal {
+        background: rgba(0, 0, 0, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        padding: 20px 24px;
+        font-size: 12px;
+        line-height: 2;
+        color: rgba(255, 255, 255, 0.8);
+        overflow: hidden;
+      }
+      .terminal .p {
+        color: var(--accent);
+      }
+      .terminal .c {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .terminal .v {
+        color: var(--accent2);
+      }
+      .terminal .e {
+        color: var(--danger);
+      }
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        height: 13px;
+        background: var(--accent);
+        vertical-align: text-bottom;
+        animation: blink 1s step-end infinite;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--dim);
+        padding-top: 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .footer-left {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+      }
+      .footer-right {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.15);
+        letter-spacing: 0.15em;
+      }
+      @media (max-width: 500px) {
+        .wrap {
+          padding: 40px 20px 60px;
+          gap: 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- top bar -->
+      <div class="topbar">
+        <div class="logo">SRVRX // INFRASTRUCTURE</div>
+        <div class="badge">&#9679; RESTRICTED ACCESS</div>
+      </div>
 
-  /* scan line animation */
-  body::after {
-    content: '';
-    position: fixed; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: 0.15;
-    animation: scan 6s linear infinite;
-    z-index: 1;
-    pointer-events: none;
-  }
-  @keyframes scan { from { top: -2px; } to { top: 100vh; } }
-
-  .wrap {
-    position: relative; z-index: 2;
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 60px 32px 80px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    gap: 56px;
-  }
-
-  /* --- top bar --- */
-  .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--dim);
-    padding-bottom: 16px;
-  }
-  .logo {
-    font-size: 13px;
-    letter-spacing: 0.25em;
-    color: var(--accent);
-    font-weight: bold;
-  }
-  .badge {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--danger);
-    border: 1px solid var(--danger);
-    padding: 3px 10px;
-    border-radius: 2px;
-    animation: blink 2.4s step-end infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  /* --- hero --- */
-  .hero { display: flex; flex-direction: column; gap: 20px; }
-  .hero-eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-  .hero-title {
-    font-size: clamp(32px, 6vw, 58px);
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-    line-height: 1.1;
-    color: #fff;
-    letter-spacing: -0.01em;
-  }
-  .hero-title .hl { color: var(--accent); }
-  .hero-title .hl2 { color: var(--accent2); }
-
-  .hero-sub {
-    font-size: 13px;
-    line-height: 1.8;
-    color: var(--muted);
-    max-width: 520px;
-    font-family: 'Courier New', monospace;
-  }
-  .hero-sub .blk {
-    background: rgba(0,255,180,0.07);
-    color: var(--accent);
-    padding: 0 5px;
-    border-radius: 2px;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-  }
-
-  /* --- status block --- */
-  .status-block {
-    background: rgba(255,68,102,0.05);
-    border: 1px solid rgba(255,68,102,0.2);
-    border-radius: 4px;
-    padding: 18px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .status-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    font-size: 12px;
-    line-height: 1.6;
-  }
-  .status-key {
-    color: var(--danger);
-    min-width: 110px;
-    flex-shrink: 0;
-    letter-spacing: 0.1em;
-    font-size: 10px;
-  }
-  .status-val { color: var(--muted); }
-
-  /* --- capability grid --- */
-  .section-label {
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--dim);
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1px;
-    background: var(--dim);
-    border: 1px solid var(--dim);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .cell {
-    background: var(--bg);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    transition: background 0.2s;
-  }
-  .cell:hover { background: rgba(0,255,180,0.04); }
-  .cell-tag {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
-  .cell-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.9);
-    letter-spacing: 0.05em;
-  }
-  .cell-desc {
-    font-size: 11px;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-  .cell-stack {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 4px;
-  }
-  .tag {
-    font-size: 9px;
-    padding: 2px 7px;
-    border: 1px solid rgba(10,170,255,0.25);
-    color: var(--accent2);
-    border-radius: 2px;
-    letter-spacing: 0.1em;
-  }
-
-  /* --- terminal block --- */
-  .terminal {
-    background: rgba(0,0,0,0.6);
-    border: 1px solid var(--dim);
-    border-radius: 4px;
-    padding: 20px 24px;
-    font-size: 12px;
-    line-height: 2;
-    color: var(--muted);
-    overflow: hidden;
-  }
-  .terminal .p { color: var(--accent); }
-  .terminal .c { color: rgba(255,255,255,0.5); }
-  .terminal .v { color: var(--accent2); }
-  .terminal .e { color: var(--danger); }
-  .cursor {
-    display: inline-block;
-    width: 8px; height: 13px;
-    background: var(--accent);
-    vertical-align: text-bottom;
-    animation: blink 1s step-end infinite;
-  }
-
-  /* --- footer --- */
-  .footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--dim);
-    padding-top: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .footer-left { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
-  .footer-right { font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 0.15em; }
-
-  @media (max-width: 500px) {
-    .wrap { padding: 40px 20px 60px; gap: 40px; }
-  }
-</style>
-</head>
-<body>
-<div class="wrap">
-
-  <!-- top bar -->
-  <div class="topbar">
-    <div class="logo">SRVRX // INFRASTRUCTURE</div>
-    <div class="badge">&#9679; RESTRICTED ACCESS</div>
-  </div>
-
-  <!-- hero -->
-  <div class="hero">
-    <div class="hero-eyebrow">// internal systems — not for public consumption</div>
-    <div class="hero-title">
-      We build the<br>
-      <span class="hl">invisible layer</span><br>
-      <span class="hl2">everything runs on.</span>
-    </div>
-    <div class="hero-sub">
-      If you're here, you weren't meant to be. This domain operates
-      <span class="blk">*.env.srvrx.run</span> — a private mesh of
-      client environments, deployment pipelines, and platform services.
-      What you see is the surface. The infrastructure goes deeper.
-    </div>
-  </div>
-
-  <!-- status -->
-  <div class="status-block">
-    <div class="status-row">
-      <div class="status-key">ACCESS_LEVEL</div>
-      <div class="status-val">PUBLIC — INGRESS BLOCKED. Internal routes operate on authenticated subdomains only.</div>
-    </div>
-    <div class="status-row">
-      <div class="status-key">ENVIRONMENT</div>
-      <div class="status-val">SIT / UAT / PROD zones active. Client namespaces isolated per tenant.</div>
-    </div>
-    <div class="status-row">
-      <div class="status-key">DISCLOSURE</div>
-      <div class="status-val">This platform is not a product. It is an operational substrate for engineering teams we work with.</div>
-    </div>
-  </div>
-
-  <!-- capabilities -->
-  <div>
-    <div class="section-label">Capability surface</div>
-    <div class="grid">
-      <div class="cell">
-        <div class="cell-tag">01 / Infra</div>
-        <div class="cell-title">Cloud-native architecture</div>
-        <div class="cell-desc">Multi-tenant platform design, zero-downtime deployments, environment-aware routing.</div>
-        <div class="cell-stack">
-          <span class="tag">K8s</span>
-          <span class="tag">Traefik</span>
-          <span class="tag">Terraform</span>
+      <!-- hero -->
+      <div class="hero">
+        <div class="hero-eyebrow">
+          // internal systems — not for public consumption
+        </div>
+        <div class="hero-title">
+          We build the<br />
+          <span class="hl">invisible layer</span><br />
+          <span class="hl2">everything runs on.</span>
+        </div>
+        <div class="hero-sub">
+          If you're here, you weren't meant to be. This domain operates
+          <span class="blk">*.env.srvrx.run</span> — a private mesh of client
+          environments, deployment pipelines, and platform services. What you
+          see is the surface. The infrastructure goes deeper.
         </div>
       </div>
-      <div class="cell">
-        <div class="cell-tag">02 / Platform</div>
-        <div class="cell-title">Developer platforms</div>
-        <div class="cell-desc">Internal developer portals, self-service env provisioning, GitOps pipelines.</div>
-        <div class="cell-stack">
-          <span class="tag">ArgoCD</span>
-          <span class="tag">Backstage</span>
-          <span class="tag">GitHub Actions</span>
+
+      <!-- status -->
+      <div class="status-block">
+        <div class="status-row">
+          <div class="status-key">ACCESS_LEVEL</div>
+          <div class="status-val">
+            PUBLIC — INGRESS BLOCKED. Internal routes operate on authenticated
+            subdomains only.
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-key">ENVIRONMENT</div>
+          <div class="status-val">
+            SIT / UAT / PROD zones active. Client namespaces isolated per
+            tenant.
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-key">DISCLOSURE</div>
+          <div class="status-val">
+            This platform is not a product. It is an operational substrate for
+            engineering teams we work with.
+          </div>
         </div>
       </div>
-      <div class="cell">
-        <div class="cell-tag">03 / Backend</div>
-        <div class="cell-title">API & service design</div>
-        <div class="cell-desc">Microservices, event-driven systems, API gateway patterns, async workloads.</div>
-        <div class="cell-stack">
-          <span class="tag">Node</span>
-          <span class="tag">Go</span>
-          <span class="tag">Kafka</span>
-          <span class="tag">gRPC</span>
+
+      <!-- capabilities -->
+      <div>
+        <div class="section-label">Capability surface</div>
+        <div class="grid">
+          <div class="cell">
+            <div class="cell-tag">01 / Infra</div>
+            <div class="cell-title">Cloud-native architecture</div>
+            <div class="cell-desc">
+              Multi-tenant platform design, zero-downtime deployments,
+              environment-aware routing.
+            </div>
+            <div class="cell-stack">
+              <span class="tag">K8s</span><span class="tag">Traefik</span
+              ><span class="tag">Terraform</span>
+            </div>
+          </div>
+          <div class="cell">
+            <div class="cell-tag">02 / Platform</div>
+            <div class="cell-title">Developer platforms</div>
+            <div class="cell-desc">
+              Internal developer portals, self-service env provisioning, GitOps
+              pipelines.
+            </div>
+            <div class="cell-stack">
+              <span class="tag">ArgoCD</span><span class="tag">Backstage</span
+              ><span class="tag">GitHub Actions</span>
+            </div>
+          </div>
+          <div class="cell">
+            <div class="cell-tag">03 / Backend</div>
+            <div class="cell-title">API & service design</div>
+            <div class="cell-desc">
+              Microservices, event-driven systems, API gateway patterns, async
+              workloads.
+            </div>
+            <div class="cell-stack">
+              <span class="tag">Node</span><span class="tag">Go</span
+              ><span class="tag">Kafka</span><span class="tag">gRPC</span>
+            </div>
+          </div>
+          <div class="cell">
+            <div class="cell-tag">04 / Observability</div>
+            <div class="cell-title">Platform intelligence</div>
+            <div class="cell-desc">
+              Distributed tracing, log aggregation, anomaly detection across
+              environments.
+            </div>
+            <div class="cell-stack">
+              <span class="tag">Grafana</span><span class="tag">Loki</span
+              ><span class="tag">Tempo</span><span class="tag">Prometheus</span>
+            </div>
+          </div>
+          <div class="cell">
+            <div class="cell-tag">05 / Security</div>
+            <div class="cell-title">Zero-trust posture</div>
+            <div class="cell-desc">
+              Secrets management, mTLS between services, RBAC across tenants.
+            </div>
+            <div class="cell-stack">
+              <span class="tag">Vault</span><span class="tag">SOPS</span
+              ><span class="tag">Cert-manager</span>
+            </div>
+          </div>
+          <div class="cell">
+            <div class="cell-tag">06 / Delivery</div>
+            <div class="cell-title">Continuous delivery</div>
+            <div class="cell-desc">
+              Environment promotion workflows, feature flag systems, canary
+              rollout strategies.
+            </div>
+            <div class="cell-stack">
+              <span class="tag">Helm</span><span class="tag">Flux</span
+              ><span class="tag">LaunchDarkly</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="cell">
-        <div class="cell-tag">04 / Observability</div>
-        <div class="cell-title">Platform intelligence</div>
-        <div class="cell-desc">Distributed tracing, log aggregation, anomaly detection across environments.</div>
-        <div class="cell-stack">
-          <span class="tag">Grafana</span>
-          <span class="tag">Loki</span>
-          <span class="tag">Tempo</span>
-          <span class="tag">Prometheus</span>
+
+      <!-- infrastructure mesh diagram -->
+      <div>
+        <div class="section-label">Infrastructure mesh</div>
+        <div class="diagram-wrap">
+          <svg
+            width="100%"
+            viewBox="0 0 680 520"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <marker
+                id="arr"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="5"
+                markerHeight="5"
+                orient="auto-start-reverse"
+              >
+                <path
+                  d="M2 1L8 5L2 9"
+                  fill="none"
+                  stroke="context-stroke"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </marker>
+            </defs>
+
+            <!-- PUBLIC EDGE zone -->
+            <rect
+              x="20"
+              y="20"
+              width="640"
+              height="76"
+              rx="6"
+              fill="rgba(0,255,180,.06)"
+              stroke="rgba(0,255,180,.4)"
+              stroke-width="0.5"
+              stroke-dasharray="5 4"
+            />
+            <text
+              x="32"
+              y="38"
+              font-family="Courier New"
+              font-size="9"
+              fill="#00ffb4"
+              letter-spacing="2"
+            >
+              PUBLIC EDGE
+            </text>
+            <rect
+              x="48"
+              y="44"
+              width="100"
+              height="36"
+              rx="4"
+              fill="rgba(0,255,180,.12)"
+              stroke="rgba(0,255,180,.6)"
+              stroke-width="0.5"
+            />
+            <text
+              x="98"
+              y="57"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="11"
+              fill="#00ffb4"
+              font-weight="bold"
+            >
+              DNS
+            </text>
+            <text
+              x="98"
+              y="70"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(0,255,180,.85)"
+            >
+              wildcard zones
+            </text>
+            <rect
+              x="200"
+              y="44"
+              width="100"
+              height="36"
+              rx="4"
+              fill="rgba(41,182,246,.12)"
+              stroke="rgba(41,182,246,.6)"
+              stroke-width="0.5"
+            />
+            <text
+              x="250"
+              y="57"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="11"
+              fill="#29b6f6"
+              font-weight="bold"
+            >
+              WAF
+            </text>
+            <text
+              x="250"
+              y="70"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(41,182,246,.85)"
+            >
+              rate limit · filter
+            </text>
+            <rect
+              x="352"
+              y="44"
+              width="100"
+              height="36"
+              rx="4"
+              fill="rgba(41,182,246,.12)"
+              stroke="rgba(41,182,246,.6)"
+              stroke-width="0.5"
+            />
+            <text
+              x="402"
+              y="57"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="11"
+              fill="#29b6f6"
+              font-weight="bold"
+            >
+              CDN
+            </text>
+            <text
+              x="402"
+              y="70"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(41,182,246,.85)"
+            >
+              edge cache
+            </text>
+            <rect
+              x="504"
+              y="44"
+              width="130"
+              height="36"
+              rx="4"
+              fill="rgba(0,255,180,.12)"
+              stroke="rgba(0,255,180,.6)"
+              stroke-width="0.5"
+            />
+            <text
+              x="569"
+              y="57"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="11"
+              fill="#00ffb4"
+              font-weight="bold"
+            >
+              Load Balancer
+            </text>
+            <text
+              x="569"
+              y="70"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(0,255,180,.85)"
+            >
+              nginx · TLS term
+            </text>
+
+            <!-- INGRESS MESH zone -->
+            <rect
+              x="20"
+              y="110"
+              width="640"
+              height="66"
+              rx="6"
+              fill="rgba(41,182,246,.06)"
+              stroke="rgba(41,182,246,.4)"
+              stroke-width="0.5"
+              stroke-dasharray="5 4"
+            />
+            <text
+              x="32"
+              y="126"
+              font-family="Courier New"
+              font-size="9"
+              fill="#29b6f6"
+              letter-spacing="2"
+            >
+              INGRESS MESH
+            </text>
+            <rect
+              x="140"
+              y="132"
+              width="160"
+              height="32"
+              rx="4"
+              fill="rgba(41,182,246,.15)"
+              stroke="rgba(41,182,246,.65)"
+              stroke-width="0.5"
+            />
+            <text
+              x="220"
+              y="143"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="11"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              Ingress controller
+            </text>
+            <text
+              x="220"
+              y="156"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(41,182,246,.9)"
+            >
+              cert-manager · mTLS
+            </text>
+            <rect
+              x="370"
+              y="132"
+              width="140"
+              height="32"
+              rx="4"
+              fill="rgba(41,182,246,.15)"
+              stroke="rgba(41,182,246,.65)"
+              stroke-width="0.5"
+            />
+            <text
+              x="440"
+              y="143"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="11"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              API gateway
+            </text>
+            <text
+              x="440"
+              y="156"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(41,182,246,.9)"
+            >
+              auth · routing · quota
+            </text>
+
+            <!-- SERVICE MESH zone -->
+            <rect
+              x="20"
+              y="190"
+              width="640"
+              height="160"
+              rx="6"
+              fill="rgba(150,120,255,.06)"
+              stroke="rgba(180,150,255,.4)"
+              stroke-width="0.5"
+              stroke-dasharray="5 4"
+            />
+            <text
+              x="32"
+              y="208"
+              font-family="Courier New"
+              font-size="9"
+              fill="#c8a0ff"
+              letter-spacing="2"
+            >
+              SERVICE MESH — INTERNAL
+            </text>
+
+            <!-- Tenant A -->
+            <rect
+              x="36"
+              y="215"
+              width="180"
+              height="122"
+              rx="5"
+              fill="rgba(0,255,180,.05)"
+              stroke="rgba(0,255,180,.4)"
+              stroke-width="0.5"
+              stroke-dasharray="3 3"
+            />
+            <text
+              x="126"
+              y="230"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(0,255,180,.9)"
+              letter-spacing="1"
+            >
+              TENANT — A
+            </text>
+            <rect
+              x="50"
+              y="238"
+              width="72"
+              height="28"
+              rx="3"
+              fill="rgba(0,255,180,.12)"
+              stroke="rgba(0,255,180,.5)"
+              stroke-width="0.5"
+            />
+            <text
+              x="86"
+              y="252"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              UI svc
+            </text>
+            <rect
+              x="134"
+              y="238"
+              width="72"
+              height="28"
+              rx="3"
+              fill="rgba(0,255,180,.12)"
+              stroke="rgba(0,255,180,.5)"
+              stroke-width="0.5"
+            />
+            <text
+              x="170"
+              y="252"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              API svc
+            </text>
+            <rect
+              x="50"
+              y="278"
+              width="156"
+              height="44"
+              rx="4"
+              fill="rgba(255,68,102,.08)"
+              stroke="rgba(255,68,102,.55)"
+              stroke-width="0.5"
+              stroke-dasharray="2 3"
+            />
+            <text
+              x="128"
+              y="296"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ff6b6b"
+              font-weight="bold"
+            >
+              [ REDACTED ]
+            </text>
+            <text
+              x="128"
+              y="311"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="8"
+              fill="rgba(255,107,107,.7)"
+            >
+              classified subsystem
+            </text>
+            <circle
+              cx="128"
+              cy="300"
+              r="3"
+              fill="#ff6b6b"
+              style="animation: pulse 2s ease-in-out infinite"
+            />
+
+            <!-- Tenant B -->
+            <rect
+              x="250"
+              y="215"
+              width="180"
+              height="122"
+              rx="5"
+              fill="rgba(41,182,246,.05)"
+              stroke="rgba(41,182,246,.4)"
+              stroke-width="0.5"
+              stroke-dasharray="3 3"
+            />
+            <text
+              x="340"
+              y="230"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(41,182,246,.9)"
+              letter-spacing="1"
+            >
+              TENANT — B
+            </text>
+            <rect
+              x="264"
+              y="238"
+              width="72"
+              height="28"
+              rx="3"
+              fill="rgba(41,182,246,.12)"
+              stroke="rgba(41,182,246,.5)"
+              stroke-width="0.5"
+            />
+            <text
+              x="300"
+              y="252"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              UI svc
+            </text>
+            <rect
+              x="348"
+              y="238"
+              width="72"
+              height="28"
+              rx="3"
+              fill="rgba(41,182,246,.12)"
+              stroke="rgba(41,182,246,.5)"
+              stroke-width="0.5"
+            />
+            <text
+              x="384"
+              y="252"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              API svc
+            </text>
+            <rect
+              x="264"
+              y="278"
+              width="156"
+              height="44"
+              rx="4"
+              fill="rgba(255,68,102,.08)"
+              stroke="rgba(255,68,102,.55)"
+              stroke-width="0.5"
+              stroke-dasharray="2 3"
+            />
+            <text
+              x="342"
+              y="296"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ff6b6b"
+              font-weight="bold"
+            >
+              [ REDACTED ]
+            </text>
+            <text
+              x="342"
+              y="311"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="8"
+              fill="rgba(255,107,107,.7)"
+            >
+              classified subsystem
+            </text>
+            <circle
+              cx="342"
+              cy="300"
+              r="3"
+              fill="#ff6b6b"
+              style="animation: pulse 2.4s ease-in-out infinite"
+            />
+
+            <!-- Platform svc -->
+            <rect
+              x="464"
+              y="215"
+              width="180"
+              height="122"
+              rx="5"
+              fill="rgba(200,160,255,.05)"
+              stroke="rgba(200,160,255,.4)"
+              stroke-width="0.5"
+              stroke-dasharray="3 3"
+            />
+            <text
+              x="554"
+              y="230"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="9"
+              fill="rgba(200,160,255,.9)"
+              letter-spacing="1"
+            >
+              PLATFORM SVC
+            </text>
+            <rect
+              x="478"
+              y="238"
+              width="72"
+              height="28"
+              rx="3"
+              fill="rgba(200,160,255,.12)"
+              stroke="rgba(200,160,255,.5)"
+              stroke-width="0.5"
+            />
+            <text
+              x="514"
+              y="252"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              Auth
+            </text>
+            <rect
+              x="562"
+              y="238"
+              width="72"
+              height="28"
+              rx="3"
+              fill="rgba(200,160,255,.12)"
+              stroke="rgba(200,160,255,.5)"
+              stroke-width="0.5"
+            />
+            <text
+              x="598"
+              y="252"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              Vault
+            </text>
+            <rect
+              x="478"
+              y="278"
+              width="156"
+              height="44"
+              rx="4"
+              fill="rgba(255,68,102,.08)"
+              stroke="rgba(255,68,102,.55)"
+              stroke-width="0.5"
+              stroke-dasharray="2 3"
+            />
+            <text
+              x="556"
+              y="296"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ff6b6b"
+              font-weight="bold"
+            >
+              [ REDACTED ]
+            </text>
+            <text
+              x="556"
+              y="311"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="8"
+              fill="rgba(255,107,107,.7)"
+            >
+              classified subsystem
+            </text>
+            <circle
+              cx="556"
+              cy="300"
+              r="3"
+              fill="#ff6b6b"
+              style="animation: pulse 2.8s ease-in-out infinite"
+            />
+
+            <!-- DATA PLANE zone -->
+            <rect
+              x="20"
+              y="364"
+              width="640"
+              height="80"
+              rx="6"
+              fill="rgba(255,180,0,.06)"
+              stroke="rgba(255,180,0,.4)"
+              stroke-width="0.5"
+              stroke-dasharray="5 4"
+            />
+            <text
+              x="32"
+              y="381"
+              font-family="Courier New"
+              font-size="9"
+              fill="#ffb300"
+              letter-spacing="2"
+            >
+              DATA PLANE · OBSERVABILITY
+            </text>
+            <rect
+              x="48"
+              y="387"
+              width="100"
+              height="44"
+              rx="4"
+              fill="rgba(255,180,0,.12)"
+              stroke="rgba(255,180,0,.55)"
+              stroke-width="0.5"
+            />
+            <text
+              x="98"
+              y="404"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              Data stores
+            </text>
+            <text
+              x="98"
+              y="418"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="8"
+              fill="rgba(255,179,0,.85)"
+            >
+              [ topology sealed ]
+            </text>
+            <rect
+              x="200"
+              y="387"
+              width="100"
+              height="44"
+              rx="4"
+              fill="rgba(255,180,0,.12)"
+              stroke="rgba(255,180,0,.55)"
+              stroke-width="0.5"
+            />
+            <text
+              x="250"
+              y="404"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              Event bus
+            </text>
+            <text
+              x="250"
+              y="418"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="8"
+              fill="rgba(255,179,0,.85)"
+            >
+              async · at-least-once
+            </text>
+            <rect
+              x="352"
+              y="387"
+              width="140"
+              height="44"
+              rx="4"
+              fill="rgba(255,180,0,.12)"
+              stroke="rgba(255,180,0,.55)"
+              stroke-width="0.5"
+            />
+            <text
+              x="422"
+              y="404"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              Observability
+            </text>
+            <text
+              x="422"
+              y="418"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="8"
+              fill="rgba(255,179,0,.85)"
+            >
+              traces · logs · metrics
+            </text>
+            <rect
+              x="544"
+              y="387"
+              width="100"
+              height="44"
+              rx="4"
+              fill="rgba(255,180,0,.12)"
+              stroke="rgba(255,180,0,.55)"
+              stroke-width="0.5"
+            />
+            <text
+              x="594"
+              y="404"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="10"
+              fill="#ffffff"
+              font-weight="bold"
+            >
+              CI / CD
+            </text>
+            <text
+              x="594"
+              y="418"
+              text-anchor="middle"
+              font-family="Courier New"
+              font-size="8"
+              fill="rgba(255,179,0,.85)"
+            >
+              GitOps · promote
+            </text>
+
+            <!-- Flow connectors -->
+            <line
+              x1="148"
+              y1="62"
+              x2="200"
+              y2="62"
+              stroke="rgba(0,255,180,.7)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 1.4s linear infinite"
+            />
+            <line
+              x1="300"
+              y1="62"
+              x2="352"
+              y2="62"
+              stroke="rgba(41,182,246,.7)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 1.8s linear infinite"
+            />
+            <line
+              x1="452"
+              y1="62"
+              x2="504"
+              y2="62"
+              stroke="rgba(41,182,246,.7)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 2s linear infinite"
+            />
+            <line
+              x1="569"
+              y1="80"
+              x2="290"
+              y2="132"
+              stroke="rgba(41,182,246,.6)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 2.2s linear infinite"
+            />
+            <line
+              x1="569"
+              y1="80"
+              x2="480"
+              y2="132"
+              stroke="rgba(41,182,246,.6)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 1.9s linear infinite"
+            />
+            <path
+              d="M200 164 L126 215"
+              fill="none"
+              stroke="rgba(0,255,180,.55)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 2s linear infinite"
+            />
+            <path
+              d="M240 164 L340 215"
+              fill="none"
+              stroke="rgba(41,182,246,.55)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 2.4s linear infinite"
+            />
+            <path
+              d="M460 164 L554 215"
+              fill="none"
+              stroke="rgba(200,160,255,.55)"
+              stroke-width="1"
+              stroke-dasharray="4 3"
+              marker-end="url(#arr)"
+              style="animation: flow 1.7s linear infinite"
+            />
+            <line
+              x1="126"
+              y1="352"
+              x2="200"
+              y2="387"
+              stroke="rgba(255,180,0,.6)"
+              stroke-width="1"
+              stroke-dasharray="3 3"
+              marker-end="url(#arr)"
+              style="animation: flow 2.6s linear infinite"
+            />
+            <line
+              x1="340"
+              y1="352"
+              x2="300"
+              y2="387"
+              stroke="rgba(255,180,0,.6)"
+              stroke-width="1"
+              stroke-dasharray="3 3"
+              marker-end="url(#arr)"
+              style="animation: flow 2.1s linear infinite"
+            />
+            <line
+              x1="554"
+              y1="352"
+              x2="422"
+              y2="387"
+              stroke="rgba(255,180,0,.6)"
+              stroke-width="1"
+              stroke-dasharray="3 3"
+              marker-end="url(#arr)"
+              style="animation: flow 2.3s linear infinite"
+            />
+            <line
+              x1="126"
+              y1="352"
+              x2="370"
+              y2="387"
+              stroke="rgba(255,180,0,.3)"
+              stroke-width="0.7"
+              stroke-dasharray="3 4"
+              marker-end="url(#arr)"
+            />
+            <line
+              x1="554"
+              y1="352"
+              x2="492"
+              y2="387"
+              stroke="rgba(255,180,0,.3)"
+              stroke-width="0.7"
+              stroke-dasharray="3 4"
+              marker-end="url(#arr)"
+            />
+          </svg>
+
+          <div class="legend">
+            <div class="leg-item">
+              <div
+                class="leg-dot"
+                style="background: rgba(0, 255, 180, 0.5)"
+              ></div>
+              Edge / routing
+            </div>
+            <div class="leg-item">
+              <div
+                class="leg-dot"
+                style="background: rgba(41, 182, 246, 0.5)"
+              ></div>
+              Ingress / API
+            </div>
+            <div class="leg-item">
+              <div
+                class="leg-dot"
+                style="background: rgba(200, 160, 255, 0.5)"
+              ></div>
+              Platform services
+            </div>
+            <div class="leg-item">
+              <div
+                class="leg-dot"
+                style="background: rgba(255, 180, 0, 0.5)"
+              ></div>
+              Data / observability
+            </div>
+            <div class="leg-item">
+              <div
+                class="leg-dot"
+                style="background: rgba(255, 68, 102, 0.5); border-radius: 50%"
+              ></div>
+              Classified subsystem
+            </div>
+          </div>
         </div>
       </div>
-      <div class="cell">
-        <div class="cell-tag">05 / Security</div>
-        <div class="cell-title">Zero-trust posture</div>
-        <div class="cell-desc">Secrets management, mTLS between services, RBAC across tenants.</div>
-        <div class="cell-stack">
-          <span class="tag">Vault</span>
-          <span class="tag">SOPS</span>
-          <span class="tag">Cert-manager</span>
+
+      <!-- terminal -->
+      <div class="terminal">
+        <div>
+          <span class="p">srvrx@mesh:~$</span>
+          <span class="c">resolve client2-crm-ui.sit.srvrx.run</span>
+        </div>
+        <div>
+          <span class="v">→ wildcard match</span>
+          <span class="c">*.sit.srvrx.run → 10.x.x.x (traefik ingress)</span>
+        </div>
+        <div>
+          <span class="v">→ router match</span>
+          <span class="c">Host(`client2-crm-ui.sit.srvrx.run`)</span>
+        </div>
+        <div>
+          <span class="v">→ tls</span>
+          <span class="c">wildcard cert *.sit.srvrx.run [valid]</span>
+        </div>
+        <div>
+          <span class="p">srvrx@mesh:~$</span> <span class="c">env list</span>
+        </div>
+        <div><span class="c">SIT &nbsp;·· 12 tenants active</span></div>
+        <div><span class="c">UAT &nbsp;·· 8 tenants active</span></div>
+        <div>
+          <span class="e"
+            >PROD &nbsp;·· [CLASSIFIED]
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
+          ><span class="cursor"></span>
         </div>
       </div>
-      <div class="cell">
-        <div class="cell-tag">06 / Delivery</div>
-        <div class="cell-title">Continuous delivery</div>
-        <div class="cell-desc">Environment promotion workflows, feature flag systems, canary rollout strategies.</div>
-        <div class="cell-stack">
-          <span class="tag">Helm</span>
-          <span class="tag">Flux</span>
-          <span class="tag">LaunchDarkly</span>
+
+      <!-- footer -->
+      <div class="footer">
+        <div class="footer-left">
+          srvrx.run &mdash; private infrastructure operations
         </div>
+        <div class="footer-right">NOT FOR PUBLIC DISTRIBUTION</div>
       </div>
     </div>
-  </div>
-
-  <!-- terminal -->
-  <div class="terminal">
-    <div><span class="p">srvrx@mesh:~$</span> <span class="c">resolve client2-crm-ui.sit.srvrx.run</span></div>
-    <div><span class="v">→ wildcard match</span> <span class="c">*.sit.srvrx.run → 10.x.x.x (traefik ingress)</span></div>
-    <div><span class="v">→ router match</span> <span class="c">Host(`client2-crm-ui.sit.srvrx.run`)</span></div>
-    <div><span class="v">→ tls</span> <span class="c">wildcard cert *.sit.srvrx.run [valid]</span></div>
-    <div><span class="p">srvrx@mesh:~$</span> <span class="c">env list</span></div>
-    <div><span class="c">SIT  &nbsp;·· 12 tenants active</span></div>
-    <div><span class="c">UAT  &nbsp;·· 8 tenants active</span></div>
-    <div><span class="e">PROD &nbsp;·· [CLASSIFIED] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="cursor"></span></div>
-  </div>
-
-  <!-- footer -->
-  <div class="footer">
-    <div class="footer-left">srvrx.run &mdash; private infrastructure operations</div>
-    <div class="footer-right">NOT FOR PUBLIC DISTRIBUTION</div>
-  </div>
-
-</div>
-</body>
+  </body>
 </html>
